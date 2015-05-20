@@ -64,7 +64,6 @@ Debug\main.o
 Debug\main_it.o
 Debug\stm8s_clk.o
 Debug\stm8s_gpio.o
-Debug\stm8s_uart1.o
 Debug\stm8s_uart3.o
 
 #<END OBJECT_FILES>

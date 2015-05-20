@@ -1,7 +1,4 @@
-
-#dbg
-.metadata
-# 忽略*.o和*.a文件
+﻿# 忽略*.o和*.a文件
 # *.[oa]
 # 忽略*.b和*.B文件，my.b除外
 #*.[bB]
@@ -15,3 +12,8 @@
 #!dbg/
 # 只忽略当前目录下的dbg文件和目录，子目录的dbg不在忽略范围内
 #/dbg
+.metadata
+mcu_iap/Debug/
+mcu_iap/Release/
+uart/Debug/
+uart/Release/
