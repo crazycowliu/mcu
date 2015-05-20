@@ -17,3 +17,7 @@ mcu_iap/Debug/
 mcu_iap/Release/
 uart/Debug/
 uart/Release/
+demo_c/Debug/
+demo_c/Release/
+demo_cpp/Debug/
+demo_cpp/Release/
