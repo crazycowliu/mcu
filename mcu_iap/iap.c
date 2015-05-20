@@ -82,7 +82,7 @@ CONST uint8_t  iap_HSIDivFactor [4] = {1, 2, 4, 8};
     if (rx_idx == 128) {
       rx_idx = 0;
     }
-
+    //check diff
     //putchar(c);
   }
 }
