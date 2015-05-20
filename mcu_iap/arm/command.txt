@@ -1,0 +1,7 @@
+./canbus.exe /dev/ttyS6 write_g "62 62 62 66 65 65 65"
+
+clnk -lD:\tools\COSMIC\CXSTM8_32K\Lib  -o Debug\uart.sm8 -mDebug\uart.map Debug\uart_2.lkf
+cvdwarf Debug\uart.sm8
+chex -o Debug\uart.s19 Debug\uart.sm8
+
+./canbus.exe /dev/ttyS6 write_g "62 62 62 66 65 65 65" 100 "uart.s19"
