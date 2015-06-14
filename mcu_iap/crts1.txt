@@ -1,0 +1,97 @@
+　　　　　　　　　　　　b bsct         data
+descriptor AB9E:　ABAB 62 0000 ABAD 06 0100 ADAE 0034
+
+ dc.w start_ram_address	;starting address of the first image in prom
+; for each segment:
+ dc.b flag ; segment type
+ dc.w start_ram_address ; start address of segment in ram
+ dc.w end_prom_address 	; address of last data byte plus one in prom
+; after the last segment:
+ dc.b 0
+
+start 00000002 end 00000090 length   142 segment .ubsct
+start 0000ab9e end 0000abab length    13 segment .init
+start 0000abab end 0000abad length     2 segment .bsct, from
+start 0000abad end 0000adae length   513 segment .FLASH_CODE, from
+start 00009080 end 0000aad5 length  6741 segment .main_code
+start 0000aad5 end 0000ab9e length   201 segment .main_const	"AAAA" is here
+
+crtsi.s 
+...
+;
+; setup initialized data
+;
+	ldw y,__idesc__ ; data start address		y=ABAB
+	ldw x,#__idesc__+2 ; descriptor address   	x=ABA0 -> 62
+ibcl:
+	ld a,(x) ; test flag byte			a=62
+	jreq zero ; no more segment
+	bcp a,#$60 ; test for moveable code segment
+	jreq qbcl ; yes, skip it
+	ldw c_x,x ; save pointer			c_x=ABA0
+	ldw x,(3,x) ; move end address                  x=ABAD
+	ldw c_y,x ; in memory                           c_y=ABAD
+	ldw x,c_x ; reload pointer                      x=ABA0 
+	ldw x,(1,x) ; start address                     x=0000
+dbcl:
+	ld a,(y) ; transfer				move bsct,	move FLASH_CODE 
+	ld (x),a ; byte
+	incw x ; increment
+	incw y ; pointers
+	cpw y,c_y ; last byte ?
+	jrne dbcl ; no, loop again
+	ldw x,c_x ; reload pointer			x=ABA0
+qbcl:
+	addw x,#5 ; next descriptor			x=ABA5 -> 06,	x=ABAA -> 00
+	jra ibcl ; and loop
+	
+;
+; reset uninitialized data in zero page
+;
+zero:
+	ldw x,#__suzp 	; start of uninitialized zpage
+	jra loop 		; test segment end first
+zbcl:
+	ld (x),a 		; clear byte
+	incw x 			; next byte
+loop:
+	cpw x,#__endzp 	; end of zpage
+	jrne zbcl 		; no, continue
+...	
+---------------------------------------------------------------------
+main.ls
+  76  001a cd0000        	call	_iap_init_global
+  
+Debug\main.o:
+start 0000933c end 00009369 length    45 section .main_code (.text)
+
+S1 23 9320 3B008CBE8A893B00 8FBE8D89CD937F85 BF8D32008F85BF8A 32008C804B0C4B00 D4
+S1 23 9340 4B004B00AEC20089 AE000189CD9AAA5B 08A646CDA7D2CD85 84CD8597AEAAD8CD E0
+                                                                CD8597
+                                                                
+iap.ls
+1081  022a be02          	ldw	x,c_lreg+2
+1082  022c cd0000        	call	_FLASH_ProgramBlock
+
+Debug\iap.o:
+start 000084b7 end 00008af0 length  1593 section .iap_code (.text)
+start 00000100 end 00000301 length   513 section .FLASH_CODE
+
+S1 23 86E0 23BE88CD02235B04961C0007A680CDA9701E051C00801F057B11A0806B117B1160
+                 CD0223  
+---------------------------------------------------------------------
+(1) If in iap.c we have global "u8 iap_a=4; u8 buf[128];"
+    When update APP, if we add a global "@tiny u8 new_a=3" in APP, it will increase the address of "u8 buf[128]"
+    So we can not use initialized bsct or data, 
+      at least, we can not use initialized bsct or data in APP
+(2) add a Interrupt OK
+(3) APP call   IAP normal method, OK
+    APP call   IAP flash method, OK
+    IAP call   IAP flash method, OK
+    APP access IAP variable, OK
+(4) IAP call APP method, access APP variable, NOT
+(5) add a APP const or literal, OK
+(6) IAP use lib, OK, but you can not update lib any more
+(7) APP use uart1, OK, and can update UART1
+(8) IAP print, NOT
+(9) APP add a static variable
