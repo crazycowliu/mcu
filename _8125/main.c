@@ -190,7 +190,6 @@ void main(void)
     unsigned char Contr_data;
     unsigned char ADD;
 
-
 	//GPIO_Init(GPIOG, GPIO_PIN_ALL, GPIO_MODE_OUT_PP_HIGH_SLOW);
 	init_clock();
 	init_UART3_lib();
@@ -222,14 +221,16 @@ void main(void)
     GPIO_Init(GPIOB, GPIO_PIN_2, GPIO_MODE_IN_PU_NO_IT);
 
     //reset 8125
+		//RESET = 0;
 	GPIO_WriteLow(GPIOG, GPIO_PIN_3);
 	delay(1);
+	//RESET = 1;
 	GPIO_WriteHigh(GPIOG, GPIO_PIN_3);
 	delay(1000);
 
     Contr_data = 0xfc;   //command word initial value
 
-    //MS = 0;
+    //PG4=MS = 0;
     GPIO_WriteLow(GPIOG, GPIO_PIN_4);
 
     //P1=0x00;          //置 GM8125 命令字地址
@@ -292,6 +293,10 @@ void UART1_RX_IRQHandler_Impl(void){
     char c = 0;
     while(UART1_GetFlagStatus(UART1_FLAG_RXNE) == RESET);
     c = UART1_ReceiveData8();
+		
+		if (c==0) {
+			return;
+		}
     //UART1_ClearITPendingBit(UART1_IT_RXNE);
     //printf("%c", c);
 

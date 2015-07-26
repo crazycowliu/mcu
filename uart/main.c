@@ -199,7 +199,8 @@ void main(void)
 
 	while (1){
 		//Driver_UARTSendByByter('A');
-		delay(2000000);	//less than 1s
+		//delay(2000000);	//less than 1s
+		delay(200);
 		putchar('.');
 	}
 }
