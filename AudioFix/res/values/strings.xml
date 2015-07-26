@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AudioFix</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="eq">
+        <item>古典</item>
+        <item>爵士</item>
+        <item>流行</item>
+        <item>摇滚</item>
+    </string-array>
+    <string-array name="mixing">
+        <item>混音关</item>
+        <item>左前混音</item>
+        <item>右前混音</item>
+        <item>全混</item>
+    </string-array>
+
+</resources>
